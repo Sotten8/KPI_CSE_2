@@ -1,0 +1,28 @@
+{
+  "name": "kpi_cse_2",
+  "version": "1.0.0",
+  "description": "Course labs in the third semester of studying KPI`s subjects.",
+  "homepage": "https://github.com/Sotten8/KPI_CSE_2#readme",
+  "bugs": {
+    "url": "https://github.com/Sotten8/KPI_CSE_2/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sotten8/KPI_CSE_2.git"
+  },
+  "license": "MIT",
+  "authors": [
+  {
+    "name": "Stanislav",
+    "surname": "Oleksiichuk"
+  },
+  {
+    "name": "Elizabeth",
+    "surname": "Khubedzheva"
+  }],
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
