@@ -1,0 +1,56 @@
+@startuml
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+entity Owner {
+  *owner_id : UUID
+  --
+  +name : string
+  +surname : string
+  +contact_data : text
+}
+
+entity Pet {
+  *pet_id : UUID
+  --
+  +name : string
+  +age : int
+  +species : string
+  +breed : string
+  +gender : Gender
+}
+
+entity Vet {
+  *vet_id : UUID
+  --
+  +name : string
+  +surname : string
+  +experience : string
+  +contact_data : text
+  +specialisation : string
+}
+
+entity Appointment {
+  *timestamp : datetime
+  *pet_id : UUID
+  *vet_id : UUID
+  --
+  +reason : string
+}
+
+entity Diagnosis {
+  *diagnosis_id : UUID
+  --
+  +is_healthy : boolean
+  +description : text
+}
+
+Owner "1" *-- "1..n" Pet : owns
+Pet "1" *-- "0..n" Appointment : attends
+Vet "1" *-- "0..n" Appointment : accepts
+Appointment "1" *-- "1" Diagnosis : gives
+
+@enduml
