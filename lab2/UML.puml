@@ -1,0 +1,85 @@
+@startuml Veterinarian Clinic
+left to right direction
+
+actor "Owner" as Owner
+actor "Vet" as Vet
+
+Owner --> (Authorize)
+Owner --> (Manage Client Profile)
+Owner --> (View Vet List)
+Owner --> (View Vet Profile)
+Owner --> (Book an Appointment)
+Owner --> (Pay for an Appointment)
+Owner --> (View Appointment Status)
+Owner --> (View Available Slots)
+Owner --> (View a History of Appointments)
+
+Vet --> (Authorize)
+Vet --> (View a History of Appointments)
+Vet --> (Manage Vet Profile)
+Vet --> (Manage a Schedule)
+Vet --> (Manage Booking Slots)
+Vet --> (Start an Appointment)
+Vet --> (Finish an Appointment)
+Vet --> (Record Appointment Result)
+Vet --> (Write Notes after an Appointment)
+Vet --> (Provide a Price)
+Vet --> (Change Appointment Status)
+Vet --> (View Appointment Status)
+
+
+'-- Uses --
+
+(Manage Client Profile) ..> (Authorize) : uses
+(Manage Vet Profile) ..> (Authorize) : uses
+
+(View Vet Profile) ..> (View Vet List) : uses
+(View Vet Profile) ..> (Manage Vet Profile) : uses
+
+(Book an Appointment) ..> (View Available Slots) : uses 
+(View Slots) ..> (Manage Booking Slots) : uses 
+(Manage Booking Slots) ..> (Manage a Schedule) : uses
+
+(View Appointment Status) ..> (Book an Appointment) : uses
+(View Appointment Status) ..> (Change Appointment Status) : uses
+
+(Start an Appointment) ..> (Change Appointment Status) : uses
+(Start an Appointment) ..> (Provide a Price) : uses
+
+(Finish an Appointment) ..> (Change Appointment Status) : uses
+(Finish an Appointment) ..> (Write Notes after an Appointment) : uses
+(Finish an Appointment) ..> (Record Appointment Result) : uses
+(Finish an Appointment) ..> (Pay for an Appointment) : uses
+
+(Pay for an Appointment) ..> (Provide a Price) : uses
+
+(View a History of Appointments) ..> (Finish an Appointment) : uses
+(View a History of Diagnoses) ..> (Give a Diagnosis after an Appointment) : uses
+
+'-- Extends --
+(Authorize) <|-- (Login) : extends
+(Authorize) <|-- (Registrate) : extends
+
+(View a History of Appointments) <|-- (View a History of Diagnoses) : extends
+
+(Manage Client Profile) <|-- (Change Personal Information) : extends
+(Manage Client Profile) <|-- (Change Contact Data) : extends
+(Manage Client Profile) <|-- (Manage a List of Pets) : extends
+
+(View Vet List) <|-- (Search a Vet by Experience/Specialisation/Initials) : extends
+(View Vet List) <|-- (Check the Vet's Availability) : extends
+
+(View Slots) <|-- (View Available Slots) : extends 
+(View Slots) <|-- (View Booked Slots) : extends
+
+(Pay for an Appointment) <|-- (Pay by Card Online) : extends
+(Pay for an Appointment) <|-- (Pay by Card Offline) : extends
+(Pay for an Appointment) <|-- (Pay by Cash) : extends
+
+(Provide a Price) <|-- (Update a Price) : extends
+
+(Record Appointment Result) <|-- (Give a Diagnosis after an Appointment) : extends
+
+(Manage Vet Profile) <|-- (Change Personal Information) : extends
+(Manage Vet Profile) <|-- (Change Contact Data) : extends
+@enduml
