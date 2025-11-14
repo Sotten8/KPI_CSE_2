@@ -1,0 +1,80 @@
+@startuml Booking
+participant Owner
+participant VetClinicSystem
+participant DB
+actor Vet
+
+Owner -> VetClinicSystem : 1. openVets()
+activate VetClinicSystem
+VetClinicSystem -> DB : 2. Request vetsList
+activate DB
+DB --> VetClinicSystem : 3. Return vetsList
+deactivate DB
+VetClinicSystem --> Owner : 4. showVets()
+deactivate VetClinicSystem
+
+
+loop UntilNotBookAppointment
+    opt WantToFilter
+        Owner -> VetClinicSystem : 5. filterVets()
+        activate VetClinicSystem
+        VetClinicSystem -> DB : 6. Select filtered vetsList
+        activate DB
+        DB --> VetClinicSystem : 7. Return filtered vetsList
+        deactivate DB
+        VetClinicSystem --> Owner : 8. showVets()
+        deactivate VetClinicSystem
+    end
+
+    opt WantToSort
+        Owner -> VetClinicSystem : 9. sortVets()
+        activate VetClinicSystem
+        VetClinicSystem -> DB : 10. Select sorted vetsList
+        activate DB
+        DB --> VetClinicSystem : 11. Return sorted vetsList
+        deactivate DB
+        VetClinicSystem --> Owner : 12. showVets()
+        deactivate VetClinicSystem
+    end
+
+    opt ViewVetSchedule
+        Owner -> VetClinicSystem : 13. openVetSchedule()
+        activate VetClinicSystem
+        VetClinicSystem -> DB : 14. Request vet schedule
+        activate DB
+        DB --> VetClinicSystem : 15. Return vet schedule
+        deactivate DB
+        VetClinicSystem --> Owner : 16. showVetSchedule()
+        deactivate VetClinicSystem
+    end
+end
+
+loop UntilBookAppointmentConfirmed
+    Owner -> VetClinicSystem : 17. bookAppointment()
+    activate VetClinicSystem
+    VetClinicSystem -> VetClinicSystem : 18. Validate
+
+    alt ValidationDeclined
+        VetClinicSystem --> Owner : 19.1. Return Error
+    else ValidationPassed
+        VetClinicSystem -> DB : 20.1. Add appointment and update vet schedule
+        activate DB
+        
+        alt DBCheckDeclined
+            DB --> VetClinicSystem : 20.1.1. Return Error
+            VetClinicSystem --> Owner : 20.1.2. Error
+        else DBCheckPassed
+            DB --> VetClinicSystem : 20.2.1. Return SuccessInfo
+            deactivate DB
+            deactivate VetClinicSystem
+        end
+    end
+end
+
+VetClinicSystem --> Owner : 21. apptNotification('scheduled')
+activate VetClinicSystem
+
+VetClinicSystem -> Vet : 22. apptNotification('scheduled')
+deactivate VetClinicSystem
+destroy Vet
+@enduml

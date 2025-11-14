@@ -1,0 +1,83 @@
+@startuml ApptProcess
+actor Owner
+participant VetClinicSystem
+actor Vet
+participant DB
+participant PaymentService
+participant PaymentGateway
+
+Vet -> VetClinicSystem : 1. setApptStatus('in progress')
+activate VetClinicSystem
+VetClinicSystem -> DB : 2. Update appointment status to 'in progress'
+activate DB
+DB --> VetClinicSystem : 3. Return SuccessInfo
+deactivate DB
+VetClinicSystem --> Vet : 4. SuccessInfo
+deactivate VetClinicSystem
+
+Vet -> VetClinicSystem : 5. setConclusion(notes, result)
+activate VetClinicSystem
+VetClinicSystem -> DB : 6. Update notes and result
+activate DB
+DB --> VetClinicSystem : 7. Return SuccessInfo
+deactivate DB
+VetClinicSystem --> Vet : 8. SuccessInfo
+deactivate VetClinicSystem
+
+opt ResultIsDiagnosedOrRecovered
+    Vet -> VetClinicSystem : 9. setDiagnosis()
+    activate VetClinicSystem
+    VetClinicSystem -> DB : 10. Add diagnosis
+    activate DB
+    DB --> VetClinicSystem : 11. Return SuccessInfo
+    deactivate DB
+    VetClinicSystem --> Vet : 12. SuccessInfo
+    deactivate VetClinicSystem
+end
+
+alt OfflineAndCash
+    Owner -> Vet : 13.1. payForAppointment('offlineCash')
+else OfflineAndCard
+    Owner -> Vet : 14.1. payForAppointment('offlineCard')
+else OnlinePayment
+    loop UntilPaymentNotSuccessful
+        Owner -> VetClinicSystem: 15.1. payForAppointment('online')
+        activate VetClinicSystem
+        VetClinicSystem-> PaymentService : 15.2. Initiate payment
+        deactivate VetClinicSystem
+        activate PaymentService
+        
+        PaymentService -> PaymentGateway : 15.3. Process transaction
+        activate PaymentGateway
+        PaymentGateway --> PaymentService : 15.3. Return transaction status
+        deactivate PaymentGateway
+        
+        alt TransactionFailed
+            PaymentService --> VetClinicSystem: 15.4.1. Return PaymentFailure
+            activate VetClinicSystem
+            VetClinicSystem --> Owner : 15.4.2. PaymentFailure
+            VetClinicSystem -> Vet: 15.4.2. PaymentFailure
+            deactivate VetClinicSystem
+        else TransactionPassed
+            PaymentService --> VetClinicSystem : 15.5.1. Return PaymentSuccess
+            deactivate PaymentService
+            activate VetClinicSystem
+            VetClinicSystem --> Owner : 15.5.2. PaymentSuccess
+            VetClinicSystem -> Vet: 15.5.3. PaymentSuccess
+            deactivate VetClinicSystem
+        end
+    end
+end
+
+Vet -> VetClinicSystem : 16. setApptStatus('completed')
+activate VetClinicSystem 
+VetClinicSystem -> DB : 17. Update appointment status to 'completed'
+activate DB
+DB --> VetClinicSystem : 18. Return SuccessInfo
+deactivate DB
+
+VetClinicSystem --> Vet : 19. apptNotification('completed')
+VetClinicSystem --> Owner : 20. apptNotification('completed')
+deactivate VetClinicSystem
+destroy Owner
+@enduml
