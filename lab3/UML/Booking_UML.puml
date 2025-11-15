@@ -1,5 +1,5 @@
 @startuml Booking
-participant Owner
+actor Owner
 participant VetClinicSystem
 participant DB
 actor Vet
