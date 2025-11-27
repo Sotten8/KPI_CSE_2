@@ -1,0 +1,111 @@
+@startuml ApptProcess
+|Owner|
+start
+:Attend the Appointment;
+
+|System|
+
+|Vet|
+:Request Appointment Data;
+
+|System|
+:Show Appointment Data;
+
+|Vet|
+:View Appointment Data;
+:Start Appointment;
+
+|System|
+:Update Appointment Status;
+:Update Appointment Status to "in progress";
+
+|Vet|
+:Conduct Appointment;
+
+if () then (Result is Diagnosed/Recovered)
+  |Vet|
+  :Write Conclusion info: Notes, Result, Diagnosis;
+else (Result is Healthy)
+  |Vet|
+  :Write Conclusion Info: Notes, Result;
+endif
+
+|System|
+:Update Info about Appointment;
+:Send Payment Request;
+
+|Owner|
+:Receive Payment Request;
+:Choose Payment Way;
+
+switch ()
+case (OfflineCash)
+  |Owner|
+  :Pay by Cash;
+  :Send Cash Payment;
+
+  |Vet|
+  :Receive Cash Payment;
+  :Accept Cash Payment;
+
+case (OfflineCard)
+  |Owner|
+  :Pay by Card;
+  :Send Card Payment;
+
+  |Vet|
+  :Receive Card Payment;
+  :Accept Card Payment;
+
+case (Online)
+
+  |System|
+  :Show Payment Form;
+
+  |Owner|
+repeat
+  :Fill Payment Form;
+  |System|
+  :Payment Transaction;
+  :Process Transaction;
+repeat while () is (Fail) not (Success)
+  
+  |System|
+  :Notify about Payment Completion;
+  fork
+    |System|
+    :Notify Owner;
+    :Send Payment Notification;
+    |Owner|
+    :Receive Payment Notification;
+  fork again
+    |System|
+    :Notify Vet;
+    :Send Payment Notification;
+    |Vet|
+    :Receive Payment Notification;
+  |System|
+  end fork
+endswitch
+
+|Vet|
+:End Appointment;
+|System|
+:Update Appointment Status;
+:Update Appointment Status to "completed";
+:Notify About Completed Appointment;
+fork
+  :Notify Owner;
+  :Send Completion Notification;
+  |Owner|
+  :Receive Completion Notification;
+fork again
+  |System|
+  :Notify Vet;
+  :Send Completion Notification;
+  |Vet|
+  :Receive Completion Notification;
+  |System|
+end fork
+stop
+@enduml
