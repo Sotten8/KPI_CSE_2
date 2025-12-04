@@ -16,7 +16,6 @@ start
 :Start Appointment;
 
 |System|
-:Update Appointment Status;
 :Update Appointment Status to "in progress";
 
 |Vet|
@@ -32,29 +31,24 @@ endif
 
 |System|
 :Update Info about Appointment;
-:Send Payment Request;
+:Request Payment;
 
 |Owner|
-:Receive Payment Request;
 :Choose Payment Way;
 
 switch ()
 case (OfflineCash)
   |Owner|
   :Pay by Cash;
-  :Send Cash Payment;
 
   |Vet|
-  :Receive Cash Payment;
   :Accept Cash Payment;
 
 case (OfflineCard)
   |Owner|
   :Pay by Card;
-  :Send Card Payment;
 
   |Vet|
-  :Receive Card Payment;
   :Accept Card Payment;
 
 case (Online)
@@ -65,27 +59,29 @@ case (Online)
   |Owner|
 repeat
   :Fill Payment Form;
+  :Send Form;
   |System|
-  :Payment Transaction;
   :Process Transaction;
 repeat while () is (Fail) not (Success)
   
   |System|
   :Notify about Payment Completion;
   fork
-    |System|
-    :Notify Owner;
-    :Send Payment Notification;
-    |Owner|
-    :Receive Payment Notification;
-  fork again
-    |System|
-    :Notify Vet;
-    :Send Payment Notification;
-    |Vet|
-    :Receive Payment Notification;
   |System|
-  end fork
+  :Notify Owner;
+  :Send Owner Payment Notification;
+  |Owner|
+  :Receive Owner Payment Notification;
+  :Read Notification;
+  kill
+fork again
+  |System|
+  :Notify Vet;
+  :Send Vet Payment Notification;
+  |Vet|
+  :Receive Vet Payment Notification;
+  :Read Notification;
+end fork
 endswitch
 
 |Vet|
@@ -96,16 +92,18 @@ endswitch
 :Notify About Completed Appointment;
 fork
   :Notify Owner;
-  :Send Completion Notification;
+  :Send Owner Completion Notification;
   |Owner|
-  :Receive Completion Notification;
+  :Receive Owner Completion Notification;
+  :Read Notification;
+  kill
 fork again
   |System|
   :Notify Vet;
-  :Send Completion Notification;
+  :Send Vet Completion Notification;
   |Vet|
-  :Receive Completion Notification;
-  |System|
+  :Receive Vet Completion Notification;
+  :Read Notification;
 end fork
 stop
 @enduml
